@@ -79,19 +79,19 @@ namespace FlightAPI.Services.UserService
             return user;
         }
 
-        public List<User>? UpdateUser(int id, User request)
+        public List<User>? UpdateUser(int id, User user)
         {
             // tìm user
-            var user = users.Find(x => x.Id == id);
+            var oneUser = users.Find(x => x.Id == id);
 
             if (user is null)
                 return null;
 
-            user.Username = request.Username;
-            user.Email = request.Email;
-            user.Password = request.Password;
-            user.Phone = request.Phone;
-            user.RoleName = request.RoleName;
+            oneUser.Username = user.Username;
+            oneUser.Email = user.Email;
+            oneUser.Password = user.Password;
+            oneUser.Phone = user.Phone;
+            oneUser.RoleName = user.RoleName;
 
             return users;
         }

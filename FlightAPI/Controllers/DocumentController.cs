@@ -5,7 +5,7 @@ using FlightAPI.Services.DocumentService;
 
 namespace FlightAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/document")]
     [ApiController]
     public class DocumentController : ControllerBase
     {

@@ -7,7 +7,7 @@ namespace FlightAPI.Services.UserService
         List<User> GetAllUser();
         User? GetUserProfile(int id);
         List<User>? AddUser(User user);
-        List<User>? UpdateUser(int id, User request);
+        List<User>? UpdateUser(int id, User user);
         List<User>? DeleteUser(int id);
     }
 }

@@ -10,7 +10,7 @@ namespace FlightAPI.Services.DocumentService
             {
                 Id = 1,
                 Name = "VJ001",
-                CreateDate = Convert.ToDateTime("2022-04-42"),
+                CreateDate = Convert.ToDateTime("2022-02-42"),
                 Note = "Go to Tokyo",
                 Version = "1.0"
             },

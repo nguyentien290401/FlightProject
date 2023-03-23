@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FlightAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/user")]
 
     //localhost:3000/api/User/1
 
@@ -19,14 +19,14 @@ namespace FlightAPI.Controllers
             _userService = userService;
         }
 
-        [HttpGet]
+        [HttpGet("get-all")]
         public ActionResult<List<User>> GetAllUser()
         {
             // Trả về toàn bộ dữ liệu || OK là status code 200
             return _userService.GetAllUser();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get-by-id/{id}")]
         public ActionResult<User> GetUserProfile(int id)
         {
             // Tìm User bằng id
@@ -37,7 +37,7 @@ namespace FlightAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public ActionResult<List<User>> AddUser(User user)
         {
             // dữ liệu mẫu đem Add thêm model user vào
@@ -48,18 +48,18 @@ namespace FlightAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
-        public ActionResult<List<User>> UpdateUser(int id, User request)
+        [HttpPut("update/{id}")]
+        public ActionResult<List<User>> UpdateUser(int id, User user)
         {
             // tìm user
-            var result = _userService.UpdateUser(id, request);
+            var result = _userService.UpdateUser(id, user);
             if (result is null)
                 return NotFound("user not found");
 
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public ActionResult<List<User>> DeleteUser(int id)
         {
             var result = _userService.DeleteUser(id);
