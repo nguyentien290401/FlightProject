@@ -1,16 +1,25 @@
-﻿using FlightAPI.Models;
+﻿using FlightAPI.DatabaseContext;
+using FlightAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FlightAPI.Services.DocumentService
 {
     public class DocumentService : IDocumentService
     {
+        private readonly FlightDbContext _dbContext;
+        public DocumentService(FlightDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        #region Fake Document Data list
         private static List<Document> documents = new List<Document>
         {
             new Document()
             {
                 Id = 1,
                 Name = "VJ001",
-                CreateDate = Convert.ToDateTime("2022-02-42"),
+                CreateDate = Convert.ToDateTime("2022-02-24"),
                 Note = "Go to Tokyo",
                 Version = "1.0"
             },
@@ -32,50 +41,62 @@ namespace FlightAPI.Services.DocumentService
                 Version = "1.0"
             }
         };
+        #endregion
 
-        public List<Document> AddDocument(Document document)
+        public async Task<List<Document>> GetAllDocument()
         {
-            documents.Add(document);
-            return documents;
+            return await _dbContext.Documents.ToListAsync();
         }
 
-        public List<Document>? DeleteDocument(int id)
+        public async Task<Document>? GetDocumentById(int id)
         {
-            var documentFound = documents.Find(x => x.Id == id);
-            if (documentFound is null)
-                return null;
-
-            documents.Remove(documentFound);
-
-            return documents;
-        }
-
-        public List<Document> GetAllDocument()
-        {
-            return documents;
-        }
-
-        public Document? GetDocumentById(int id)
-        {
-            var documentFound = documents.Find(x => x.Id == id);
+            var documentFound = await _dbContext.Documents.FirstOrDefaultAsync(x => x.Id == id);
             if (documentFound is null)
                 return null;
 
             return documentFound;
         }
 
-        public List<Document>? UpdateDocument(int id, Document request)
+        public async Task<List<Document>> AddDocument(Document document)
         {
-            var documentFound = documents.Find(x => x.Id == id);
+            await _dbContext.Documents.AddAsync(document);
+
+            await _dbContext.SaveChangesAsync();
+
+            return await _dbContext.Documents.ToListAsync();
+        }
+
+        public async Task<List<Document>>? UpdateDocument(int id, Document document)
+        {
+            if (id != document.Id)
+                return null;
+
+            var documentFound = await _dbContext.Documents.FindAsync(id);
+
             if (documentFound is null)
                 return null;
 
-            documentFound.Name = request.Name;
-            documentFound.CreateDate = request.CreateDate;
-            documentFound.Note = request.Note;
-            documentFound.Version = request.Version;
+            documentFound.Name = document.Name;
+            documentFound.CreateDate = document.CreateDate;
+            documentFound.Note = document.Note;
+            documentFound.Version = document.Version;
 
-            return documents;
+            await _dbContext.SaveChangesAsync();
+
+            return await _dbContext.Documents.ToListAsync();
         }
+
+        public async Task<List<Document>>? DeleteDocument(int id)
+        {
+            var documentFound = await _dbContext.Documents.FindAsync(id);
+            if (documentFound == null)
+                return null;
+
+            _dbContext.Documents.Remove(documentFound);
+            await _dbContext.SaveChangesAsync();
+
+            return await _dbContext.Documents.ToListAsync();
+        }
+
     }
 }

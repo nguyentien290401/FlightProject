@@ -20,17 +20,17 @@ namespace FlightAPI.Controllers
         }
 
         [HttpGet("get-all")]
-        public ActionResult<List<User>> GetAllUser()
+        public async Task<ActionResult<List<User>>> GetAllUser()
         {
             // Trả về toàn bộ dữ liệu || OK là status code 200
-            return _userService.GetAllUser();
+            return await _userService.GetAllUser();
         }
 
         [HttpGet("get-by-id/{id}")]
-        public ActionResult<User> GetUserProfile(int id)
+        public async Task<ActionResult<User>> GetUserProfile(int id)
         {
             // Tìm User bằng id
-            var result = _userService.GetUserProfile(id);
+            var result = await _userService.GetUserProfile(id);
             if (result is null)
                 return NotFound("user not found");
 
@@ -38,10 +38,10 @@ namespace FlightAPI.Controllers
         }
 
         [HttpPost("add")]
-        public ActionResult<List<User>> AddUser(User user)
+        public async Task<ActionResult<List<User>>> AddUser(User user)
         {
             // dữ liệu mẫu đem Add thêm model user vào
-            var result = _userService.AddUser(user);
+            var result = await _userService.AddUser(user);
             if (result is null)
                 return NotFound("user not found");
 
@@ -49,10 +49,10 @@ namespace FlightAPI.Controllers
         }
 
         [HttpPut("update/{id}")]
-        public ActionResult<List<User>> UpdateUser(int id, User user)
+        public async Task<ActionResult<List<User>>> UpdateUser(int id, User user)
         {
             // tìm user
-            var result = _userService.UpdateUser(id, user);
+            var result = await _userService.UpdateUser(id, user);
             if (result is null)
                 return NotFound("user not found");
 
@@ -60,13 +60,14 @@ namespace FlightAPI.Controllers
         }
 
         [HttpDelete("delete/{id}")]
-        public ActionResult<List<User>> DeleteUser(int id)
+        public async Task<ActionResult<List<User>>> DeleteUser(int id)
         {
-            var result = _userService.DeleteUser(id);
+
+            var result = await _userService.DeleteUser(id);
             if (result is null)
                 return NotFound("user not found");
 
-            return Ok(result);
+            return NoContent();
         }
     }
 }

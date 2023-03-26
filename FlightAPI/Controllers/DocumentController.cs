@@ -15,17 +15,16 @@ namespace FlightAPI.Controllers
             _documentService = documentService;
         }
 
-
         [HttpGet]
-        public ActionResult<List<Document>> GetAllDocument()
+        public async Task<ActionResult<List<Document>>> GetAllDocument()
         {
-            return _documentService.GetAllDocument();
+            return await _documentService.GetAllDocument();
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Document> GetDocumentById(int id)
+        public async Task<ActionResult<Document>>? GetDocumentById(int id)
         {
-            var result = _documentService.GetDocumentById(id);
+            var result = await _documentService.GetDocumentById(id);
             if (result is null)
                 return NotFound("Not Found Document");
 
@@ -33,9 +32,9 @@ namespace FlightAPI.Controllers
         }
 
         [HttpPost]
-        public ActionResult<List<Document>> AddDocument(Document document)
+        public async Task<ActionResult<List<Document>>>? AddDocument(Document document)
         {
-            var result = _documentService.AddDocument(document);
+            var result = await _documentService.AddDocument(document);
             if (result is null)
                 return NotFound("Not Found Document");
 
@@ -43,9 +42,9 @@ namespace FlightAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult<List<Document>> UpdateDocument(int id, Document request)
+        public async Task<ActionResult<List<Document>>>? UpdateDocument(int id, Document document)
         {
-            var result = _documentService.UpdateDocument(id, request);
+            var result = await _documentService.UpdateDocument(id, document);
             if (result is null)
                 return NotFound("Not Found Document");
 
@@ -53,9 +52,9 @@ namespace FlightAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult<List<Document>> DeleteDocument(int id)
+        public async Task<ActionResult<List<Document>>>? DeleteDocument(int id)
         {
-            var result = _documentService.DeleteDocument(id);
+            var result = await _documentService.DeleteDocument(id);
             if (result is null)
                 return NotFound("Not Found Document");
 

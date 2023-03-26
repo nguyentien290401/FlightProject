@@ -4,10 +4,10 @@ namespace FlightAPI.Services.UserService
 {
     public interface IUserService
     {
-        List<User> GetAllUser();
-        User? GetUserProfile(int id);
-        List<User>? AddUser(User user);
-        List<User>? UpdateUser(int id, User user);
-        List<User>? DeleteUser(int id);
+        Task<List<User>> GetAllUser();
+        Task<User>? GetUserProfile(int id);
+        Task<List<User>>? AddUser(User user);
+        Task<List<User>>? UpdateUser(int id, User user);
+        Task<List<User>>? DeleteUser(int id);
     }
 }

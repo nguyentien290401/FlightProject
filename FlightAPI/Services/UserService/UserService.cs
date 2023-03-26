@@ -1,10 +1,19 @@
-﻿using FlightAPI.Models;
+﻿using FlightAPI.DatabaseContext;
+using FlightAPI.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace FlightAPI.Services.UserService
 {
     public class UserService : IUserService
     {
+        private readonly FlightDbContext _dbContext;
+        public UserService(FlightDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
+        #region Fake User Data list
         // Tạo dữ liệu mẫu thay thế cho database
         private static List<User> users = new List<User>
         {
@@ -41,50 +50,46 @@ namespace FlightAPI.Services.UserService
                 RoleName = "CREW"
             }
         };
-        public List<User> AddUser(User user)
-        {
-            // dữ liệu mẫu đem Add thêm model user vào
-            users.Add(user);
+        #endregion
 
-            // trả về list users
-            return users;
+        public async Task<List<User>> GetAllUser()
+        {
+            return await _dbContext.Users.ToListAsync();
         }
 
-        public List<User>? DeleteUser(int id)
-        {
-            var user = users.Find(x => x.Id == id);
-            if (user is null)
-                return null;
-
-            users.Remove(user);
-
-            return users;
-        }
-
-        public List<User> GetAllUser()
-        {
-            return users;
-        }
-
-        public User? GetUserProfile(int id)
+        public async Task<User>? GetUserProfile(int id)
         {
             // Tìm User bằng id
-            var user = users.Find(x => x.Id == id);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
 
             // Nếu tìm không thấy thì return về lỗi
-            if (user is null)
+            if (user == null)
                 return null;
 
             // Nếu tìm thấy thì return về user tìm thấy
             return user;
         }
 
-        public List<User>? UpdateUser(int id, User user)
+        public async Task<List<User>>? AddUser(User user)
         {
-            // tìm user
-            var oneUser = users.Find(x => x.Id == id);
+            // dữ liệu mẫu đem Add thêm model user vào
+            await _dbContext.Users.AddAsync(user);
 
-            if (user is null)
+            await _dbContext.SaveChangesAsync();
+
+            // trả về list users
+            return await _dbContext.Users.ToListAsync();
+        }
+
+        public async Task<List<User>>? UpdateUser(int id, User user)
+        {
+            if (id != user.Id)
+                return null;
+
+            // tìm user
+            var oneUser = await _dbContext.Users.FindAsync(id);
+
+            if (oneUser == null)
                 return null;
 
             oneUser.Username = user.Username;
@@ -93,7 +98,21 @@ namespace FlightAPI.Services.UserService
             oneUser.Phone = user.Phone;
             oneUser.RoleName = user.RoleName;
 
-            return users;
+            await _dbContext.SaveChangesAsync();
+
+            return await _dbContext.Users.ToListAsync();
         }
+
+        public async Task<List<User>>? DeleteUser(int id)
+        {
+            var user = await _dbContext.Users.FindAsync(id);
+            if (user is null)
+                return null;
+
+            _dbContext.Users.Remove(user);
+            await _dbContext.SaveChangesAsync();
+
+            return await _dbContext.Users.ToListAsync();
+        }  
     }
 }

@@ -4,10 +4,10 @@ namespace FlightAPI.Services.DocumentService
 {
     public interface IDocumentService
     {
-        List<Document> GetAllDocument();
-        Document? GetDocumentById(int id);
-        List<Document>? AddDocument(Document document);
-        List<Document>? UpdateDocument(int id, Document request);
-        List<Document>? DeleteDocument(int id);
+        Task<List<Document>> GetAllDocument();
+        Task<Document>? GetDocumentById(int id);
+        Task<List<Document>>? AddDocument(Document document);
+        Task<List<Document>>? UpdateDocument(int id, Document document);
+        Task<List<Document>>? DeleteDocument(int id);
     }
 }
