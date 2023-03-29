@@ -1,5 +1,6 @@
 ﻿using FlightAPI.DatabaseContext;
 using FlightAPI.Models;
+using FlightAPI.Services.DocumentService.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace FlightAPI.Services.DocumentService
@@ -43,10 +44,14 @@ namespace FlightAPI.Services.DocumentService
         };
         #endregion
 
-        public async Task<List<Document>> GetAllDocument()
+        public async Task<List<Document>> GetAllDocumentByFlightID(int flightID)
         {
-            return await _dbContext.Documents.ToListAsync();
+            var documents = await _dbContext.Documents.Where(f => f.FlightID == flightID).ToListAsync();
+
+            return documents;
         }
+
+        
 
         public async Task<Document>? GetDocumentById(int id)
         {
@@ -57,13 +62,24 @@ namespace FlightAPI.Services.DocumentService
             return documentFound;
         }
 
-        public async Task<List<Document>> AddDocument(Document document)
+        public async Task<List<Document>> AddDocument(AddDocumentDTO request)
         {
-            await _dbContext.Documents.AddAsync(document);
+            var flight = await _dbContext.Flights.FindAsync(request.FlightID);
+            if (flight == null)
+                return null;
 
+            var newDocument = new Document()
+            {
+                Name = request.Name,
+                Note = request.Note,
+                Version = Convert.ToString(request.Version + 0.1),
+                Flight = flight,
+            };
+
+            _dbContext.Documents.Add(newDocument);
             await _dbContext.SaveChangesAsync();
 
-            return await _dbContext.Documents.ToListAsync();
+            return await GetAllDocumentByFlightID(newDocument.FlightID);
         }
 
         public async Task<List<Document>>? UpdateDocument(int id, Document document)
@@ -80,6 +96,7 @@ namespace FlightAPI.Services.DocumentService
             documentFound.CreateDate = document.CreateDate;
             documentFound.Note = document.Note;
             documentFound.Version = document.Version;
+            documentFound.FlightID = document.FlightID;
 
             await _dbContext.SaveChangesAsync();
 

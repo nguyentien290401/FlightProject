@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FlightAPI.Models;
 using FlightAPI.Services.DocumentService;
+using FlightAPI.Services.DocumentService.DTO;
 
 namespace FlightAPI.Controllers
 {
@@ -16,9 +17,9 @@ namespace FlightAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Document>>> GetAllDocument()
+        public async Task<ActionResult<List<Document>>> GetAllDocumentByFlightID(int flightID)
         {
-            return await _documentService.GetAllDocument();
+            return await _documentService.GetAllDocumentByFlightID(flightID);
         }
 
         [HttpGet("{id}")]
@@ -32,7 +33,7 @@ namespace FlightAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<Document>>>? AddDocument(Document document)
+        public async Task<ActionResult<List<Document>>>? AddDocument(AddDocumentDTO document)
         {
             var result = await _documentService.AddDocument(document);
             if (result is null)

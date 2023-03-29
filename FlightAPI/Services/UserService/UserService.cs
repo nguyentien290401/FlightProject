@@ -22,39 +22,37 @@ namespace FlightAPI.Services.UserService
                 Username = "Admin",
                 Email = "Admin@vietjetair.com",
                 Password = "123456",
-                Phone = "0123456789",
-                RoleName = "ADMIN"
+                Phone = "0123456789"            
             },
             new User {
                 Id = 2,
                 Username = "GO Employee",
                 Email = "Staff@vietjetair.com",
                 Password = "123456",
-                Phone = "0123456789",
-                RoleName = "GO"
+                Phone = "0123456789"
             },
             new User {
                 Id = 3,
                 Username = "Pilot",
                 Email = "Pilot@vietjetair.com",
                 Password = "123456",
-                Phone = "0987654321",
-                RoleName = "PILOT"
+                Phone = "0987654321"
             },
             new User {
                 Id = 4,
                 Username = "Crew",
                 Email = "Crew@vietjetair.com",
                 Password = "123456",
-                Phone = "0987654321",
-                RoleName = "CREW"
+                Phone = "0987654321"
             }
         };
         #endregion
 
         public async Task<List<User>> GetAllUser()
         {
-            return await _dbContext.Users.ToListAsync();
+            var user = await _dbContext.Users.Include(r => r.Role).ToListAsync();
+
+            return user;
         }
 
         public async Task<User>? GetUserProfile(int id)
@@ -96,7 +94,7 @@ namespace FlightAPI.Services.UserService
             oneUser.Email = user.Email;
             oneUser.Password = user.Password;
             oneUser.Phone = user.Phone;
-            oneUser.RoleName = user.RoleName;
+            
 
             await _dbContext.SaveChangesAsync();
 
