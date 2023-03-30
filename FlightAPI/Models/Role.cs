@@ -11,7 +11,7 @@ namespace FlightAPI.Models
         public int Id { get; set; }
         public string RoleName { get; set; } = string.Empty;
 
-        [JsonIgnore]
-        public User User { get; set; }
+        //[JsonIgnore]
+        //public User User { get; set; }
     }
 }

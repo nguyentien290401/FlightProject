@@ -1,7 +1,10 @@
 ﻿using FlightAPI.DatabaseContext;
 using FlightAPI.Models;
+using FlightAPI.Services.UserService.DTO;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace FlightAPI.Services.UserService
 {
@@ -13,44 +16,94 @@ namespace FlightAPI.Services.UserService
             _dbContext = dbContext;
         }
 
-        #region Fake User Data list
-        // Tạo dữ liệu mẫu thay thế cho database
-        private static List<User> users = new List<User>
+        public async Task<User>? Register(UserRegisterDTO request)
         {
-            new User {
-                Id = 1,
-                Username = "Admin",
-                Email = "Admin@vietjetair.com",
-                Password = "123456",
-                Phone = "0123456789"            
-            },
-            new User {
-                Id = 2,
-                Username = "GO Employee",
-                Email = "Staff@vietjetair.com",
-                Password = "123456",
-                Phone = "0123456789"
-            },
-            new User {
-                Id = 3,
-                Username = "Pilot",
-                Email = "Pilot@vietjetair.com",
-                Password = "123456",
-                Phone = "0987654321"
-            },
-            new User {
-                Id = 4,
-                Username = "Crew",
-                Email = "Crew@vietjetair.com",
-                Password = "123456",
-                Phone = "0987654321"
-            }
-        };
-        #endregion
+            if (_dbContext.Users.Any(u => u.Email == request.Email))
+                return null;
+
+            CreatePasswordHash(request.Password,
+                 out byte[] passwordHash,
+                 out byte[] passwordSalt);
+
+            if ((request.Email.Substring(request.Email.Length - 14, 14)) != "vietjetair.com")
+                return null;
+
+            var user = new User
+            {
+                Username = request.UserName,
+                Email = request.Email,
+                Phone = request.Phone,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+                VerificationToken = CreateRandomToken()
+            };
+
+            _dbContext.Users.Add(user);
+            await _dbContext.SaveChangesAsync();
+
+            return user;
+        }
+
+        public async Task<User>? Login(UserLoginDTO request)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+            if (user == null)
+                return null;
+
+            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+                return null;
+
+            if (user.VerifiedAt == null)
+                return null;
+
+            return user;
+        }
+        public async Task<User>? VerifyEmail(string token)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
+            if (user == null)
+                return null;
+
+            user.VerifiedAt = DateTime.Now;
+            await _dbContext.SaveChangesAsync();
+
+            return user;
+        }
+
+        public async Task<User> ForgotPassword(string email)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                return null;
+
+            user.PasswordResetToken = CreateRandomToken();
+            user.ResetTokenExpires = DateTime.Now.AddDays(1);
+            await _dbContext.SaveChangesAsync();
+
+            return user;
+        }
+
+        public async Task<User> ResetPassword(ResetPasswordDTO request)
+        {
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.PasswordResetToken == request.Token);
+            if (user == null || user.ResetTokenExpires < DateTime.Now)
+                return null;
+
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.PasswordResetToken = null;
+            user.ResetTokenExpires = null;
+
+            await _dbContext.SaveChangesAsync();
+
+            return user;
+        }
 
         public async Task<List<User>> GetAllUser()
         {
-            var user = await _dbContext.Users.Include(r => r.Role).ToListAsync();
+            var user = await _dbContext.Users./*Include(r => r.Role).*/ToListAsync();
 
             return user;
         }
@@ -92,7 +145,7 @@ namespace FlightAPI.Services.UserService
 
             oneUser.Username = user.Username;
             oneUser.Email = user.Email;
-            oneUser.Password = user.Password;
+            oneUser.PasswordHash = user.PasswordHash;
             oneUser.Phone = user.Phone;
             
 
@@ -111,6 +164,31 @@ namespace FlightAPI.Services.UserService
             await _dbContext.SaveChangesAsync();
 
             return await _dbContext.Users.ToListAsync();
-        }  
+        }
+
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac
+                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        private string CreateRandomToken()
+        {
+            return Convert.ToHexString(RandomNumberGenerator.GetBytes(64));
+        }
+
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        {
+            using (var hmac = new HMACSHA512(passwordSalt))
+            {
+                var computedHash = hmac
+                    .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                return computedHash.SequenceEqual(passwordHash);
+            }
+        }
     }
 }

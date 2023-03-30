@@ -10,11 +10,19 @@ namespace FlightAPI.Models
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
 
-        public int RoleID { get; set; }
-        public Role Role { get; set; }
+        public byte[] PasswordHash { get; set; } = new byte[32];
+        public byte[] PasswordSalt { get; set; } = new byte[32];
+
+        public string? VerificationToken { get; set; }
+        public DateTime? VerifiedAt { get; set; }
+
+        public string? PasswordResetToken { get; set; }
+        public DateTime? ResetTokenExpires { get; set; }
+
+        //public int RoleID { get; set; }
+        //public Role Role { get; set; }
 
         public List<Document> Document { get; set; }
         public List<DocumentFile> DocumentFiles { get; set; }

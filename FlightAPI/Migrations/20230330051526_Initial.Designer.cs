@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlightAPI.Migrations
 {
     [DbContext(typeof(FlightDbContext))]
-    [Migration("20230329155549_Initial")]
+    [Migration("20230330051526_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -212,25 +212,35 @@ namespace FlightAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("PasswordResetToken")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoleID")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("ResetTokenExpires")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<string>("VerificationToken")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("RoleID")
-                        .IsUnique();
+                    b.Property<DateTime?>("VerifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
                 });
@@ -288,17 +298,6 @@ namespace FlightAPI.Migrations
                     b.Navigation("Document");
                 });
 
-            modelBuilder.Entity("FlightAPI.Models.User", b =>
-                {
-                    b.HasOne("FlightAPI.Models.Role", "Role")
-                        .WithOne("User")
-                        .HasForeignKey("FlightAPI.Models.User", "RoleID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
-                });
-
             modelBuilder.Entity("FlightAPI.Models.Document", b =>
                 {
                     b.Navigation("DocumentFiles");
@@ -309,12 +308,6 @@ namespace FlightAPI.Migrations
             modelBuilder.Entity("FlightAPI.Models.Flight", b =>
                 {
                     b.Navigation("Documents");
-                });
-
-            modelBuilder.Entity("FlightAPI.Models.Role", b =>
-                {
-                    b.Navigation("User")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("FlightAPI.Models.User", b =>
