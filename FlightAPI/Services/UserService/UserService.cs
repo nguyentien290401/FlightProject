@@ -4,6 +4,8 @@ using FlightAPI.Services.UserService.DTO;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
+using System.Net.Mail;
 using System.Security.Cryptography;
 
 namespace FlightAPI.Services.UserService
@@ -35,11 +37,37 @@ namespace FlightAPI.Services.UserService
                 Phone = request.Phone,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-                VerificationToken = CreateRandomToken()
+                VerificationToken = CreateRandomOTP()
             };
 
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
+
+            #region Send OTP code to verify email
+            // Send OTP code to verify email
+            //var senderEmail = new MailAddress("minhtien29042001@gmail.com", "Tiennnm@es.vn");
+            //var receiverEmail = new MailAddress(user.Email, "Receiver");
+            //var password = "Lovelive9";
+            //var sub = "Verify Email Notification !";
+            //var body = $"This is the OTP code: {user.VerificationToken} to verify your email.";
+            //var smtp = new SmtpClient
+            //{
+            //    Host = "smtp.gmail.com",
+            //    Port = 587,
+            //    EnableSsl = true,
+            //    DeliveryMethod = SmtpDeliveryMethod.Network,
+            //    UseDefaultCredentials = false,
+            //    Credentials = new NetworkCredential(senderEmail.Address, password)
+            //};
+            //using (var mess = new MailMessage(senderEmail, receiverEmail)
+            //{
+            //    Subject = sub,
+            //    Body = body
+            //})
+            //{
+            //    smtp.Send(mess);
+            //}
+            #endregion
 
             return user;
         }
@@ -61,6 +89,7 @@ namespace FlightAPI.Services.UserService
         public async Task<User>? VerifyEmail(string token)
         {
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.VerificationToken == token);
+
             if (user == null)
                 return null;
 
@@ -174,6 +203,14 @@ namespace FlightAPI.Services.UserService
                 passwordHash = hmac
                     .ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
+        }
+
+        private string CreateRandomOTP()
+        {
+            Random random = new Random();
+            var otp = random.Next(99999, 1000000);
+
+            return otp.ToString();
         }
 
         private string CreateRandomToken()
