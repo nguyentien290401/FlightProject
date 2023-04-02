@@ -1,5 +1,7 @@
 using FlightAPI.DatabaseContext;
 using FlightAPI.Services.DocumentService;
+using FlightAPI.Services.DocumentTypeService;
+using FlightAPI.Services.FlightService;
 using FlightAPI.Services.UserService;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,10 +19,13 @@ builder.Services.AddDbContext<FlightDbContext>(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 // Config Dependency injection
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IFlightService, FlightService>();
+builder.Services.AddScoped<IDocumentTypeService, DocumentTypeService>();
 
 var app = builder.Build();
 

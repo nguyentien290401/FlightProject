@@ -13,45 +13,12 @@ namespace FlightAPI.Services.DocumentService
             _dbContext = dbContext;
         }
 
-        #region Fake Document Data list
-        private static List<Document> documents = new List<Document>
-        {
-            new Document()
-            {
-                Id = 1,
-                Name = "VJ001",
-                CreateDate = Convert.ToDateTime("2022-02-24"),
-                Note = "Go to Tokyo",
-                Version = "1.0"
-            },
-            new Document()
-            {
-                Id = 2,
-                Name = "VJ002",
-                CreateDate = Convert.ToDateTime("2022-04-29"),
-                Note = "Go to Osaka",
-                Version = "1.0"
-            },
-
-            new Document()
-            {
-                Id = 3,
-                Name = "VJ003",
-                CreateDate = Convert.ToDateTime("2022-09-28"),
-                Note = "Go to Kyoto",
-                Version = "1.0"
-            }
-        };
-        #endregion
-
         public async Task<List<Document>> GetAllDocumentByFlightID(int flightID)
         {
             var documents = await _dbContext.Documents.Where(f => f.FlightID == flightID).ToListAsync();
 
             return documents;
-        }
-
-        
+        }  
 
         public async Task<Document>? GetDocumentById(int id)
         {

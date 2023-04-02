@@ -17,6 +17,6 @@ namespace FlightAPI.DatabaseContext
         public DbSet<Group> Groups { get; set; }
         public DbSet<Flight> Flights { get; set; }
 
-      
+        
     }
 }

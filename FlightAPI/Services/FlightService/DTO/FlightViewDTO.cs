@@ -1,14 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using FlightAPI.Models;
 
-namespace FlightAPI.Models
+namespace FlightAPI.Services.FlightService.DTO
 {
-    public class Flight
+    public class FlightViewDTO
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
-
         public string FlightCode { get; set; } = string.Empty;
 
         public string LocationFrom { get; set; } = string.Empty;
@@ -17,8 +12,6 @@ namespace FlightAPI.Models
 
         public DateTime DepartureDate { get; set; }
 
-       
         public List<Document> Documents { get; set; }
-        
     }
 }

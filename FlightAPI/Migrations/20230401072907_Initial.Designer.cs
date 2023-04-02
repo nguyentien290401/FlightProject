@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlightAPI.Migrations
 {
     [DbContext(typeof(FlightDbContext))]
-    [Migration("20230330051526_Initial")]
+    [Migration("20230401072907_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
