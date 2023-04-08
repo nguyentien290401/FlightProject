@@ -43,6 +43,21 @@ namespace FlightAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GroupName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -88,7 +103,8 @@ namespace FlightAPI.Migrations
                     Version = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FlightID = table.Column<int>(type: "int", nullable: false),
                     Document_TypeID = table.Column<int>(type: "int", nullable: false),
-                    UserID = table.Column<int>(type: "int", nullable: false)
+                    UserID = table.Column<int>(type: "int", nullable: false),
+                    GroupID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -103,6 +119,12 @@ namespace FlightAPI.Migrations
                         name: "FK_Documents_Flights_FlightID",
                         column: x => x.FlightID,
                         principalTable: "Flights",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Documents_Groups_GroupID",
+                        column: x => x.GroupID,
+                        principalTable: "Groups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -141,28 +163,6 @@ namespace FlightAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Groups",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    GroupName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DocumentID = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Groups", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Groups_Documents_DocumentID",
-                        column: x => x.DocumentID,
-                        principalTable: "Documents",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentFiles_DocumentId",
                 table: "DocumentFiles",
@@ -184,14 +184,14 @@ namespace FlightAPI.Migrations
                 column: "FlightID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Documents_GroupID",
+                table: "Documents",
+                column: "GroupID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Documents_UserID",
                 table: "Documents",
                 column: "UserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Groups_DocumentID",
-                table: "Groups",
-                column: "DocumentID");
         }
 
         /// <inheritdoc />
@@ -199,9 +199,6 @@ namespace FlightAPI.Migrations
         {
             migrationBuilder.DropTable(
                 name: "DocumentFiles");
-
-            migrationBuilder.DropTable(
-                name: "Groups");
 
             migrationBuilder.DropTable(
                 name: "Roles");
@@ -214,6 +211,9 @@ namespace FlightAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Flights");
+
+            migrationBuilder.DropTable(
+                name: "Groups");
 
             migrationBuilder.DropTable(
                 name: "Users");

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlightAPI.Migrations
 {
     [DbContext(typeof(FlightDbContext))]
-    [Migration("20230401072907_Initial")]
-    partial class Initial
+    [Migration("20230408110249_123")]
+    partial class _123
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,6 +42,9 @@ namespace FlightAPI.Migrations
                     b.Property<int>("FlightID")
                         .HasColumnType("int");
 
+                    b.Property<int>("GroupID")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -62,6 +65,8 @@ namespace FlightAPI.Migrations
                     b.HasIndex("Document_TypeID");
 
                     b.HasIndex("FlightID");
+
+                    b.HasIndex("GroupID");
 
                     b.HasIndex("UserID");
 
@@ -165,9 +170,6 @@ namespace FlightAPI.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DocumentID")
-                        .HasColumnType("int");
-
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -177,8 +179,6 @@ namespace FlightAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DocumentID");
 
                     b.ToTable("Groups");
                 });
@@ -259,6 +259,12 @@ namespace FlightAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FlightAPI.Models.Group", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FlightAPI.Models.User", "User")
                         .WithMany("Document")
                         .HasForeignKey("UserID")
@@ -268,6 +274,8 @@ namespace FlightAPI.Migrations
                     b.Navigation("DocumentType");
 
                     b.Navigation("Flight");
+
+                    b.Navigation("Group");
 
                     b.Navigation("User");
                 });
@@ -287,22 +295,9 @@ namespace FlightAPI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("FlightAPI.Models.Group", b =>
-                {
-                    b.HasOne("FlightAPI.Models.Document", "Document")
-                        .WithMany("Groups")
-                        .HasForeignKey("DocumentID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Document");
-                });
-
             modelBuilder.Entity("FlightAPI.Models.Document", b =>
                 {
                     b.Navigation("DocumentFiles");
-
-                    b.Navigation("Groups");
                 });
 
             modelBuilder.Entity("FlightAPI.Models.Flight", b =>

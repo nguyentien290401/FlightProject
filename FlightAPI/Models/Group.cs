@@ -12,7 +12,6 @@ namespace FlightAPI.Models
         public DateTime CreateDate { get; set; }
         public string Note { get; set; } = string.Empty;
 
-        public int DocumentID { get; set; }
-        public Document Document { get; set; }
+        
     }
 }

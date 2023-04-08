@@ -24,7 +24,10 @@ namespace FlightAPI.Models
         public User User { get; set; }
         public int UserID { get; set; }
 
+        public Group Group { get; set; }
+        public int GroupID { get; set; }
+
         public List<DocumentFile> DocumentFiles { get; set; }
-        public List<Group> Groups { get; set; } 
+        
     }
 }
