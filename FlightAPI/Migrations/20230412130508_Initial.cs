@@ -144,34 +144,34 @@ namespace FlightAPI.Migrations
                     FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserID = table.Column<int>(type: "int", nullable: false),
-                    DocumentId = table.Column<int>(type: "int", nullable: true)
+                    DocumentID = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DocumentFiles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DocumentFiles_Documents_DocumentId",
-                        column: x => x.DocumentId,
+                        name: "FK_DocumentFiles_Documents_DocumentID",
+                        column: x => x.DocumentID,
                         principalTable: "Documents",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_DocumentFiles_Users_UserID",
-                        column: x => x.UserID,
-                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DocumentFiles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentFiles_DocumentId",
+                name: "IX_DocumentFiles_DocumentID",
                 table: "DocumentFiles",
-                column: "DocumentId");
+                column: "DocumentID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentFiles_UserID",
+                name: "IX_DocumentFiles_UserId",
                 table: "DocumentFiles",
-                column: "UserID");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Documents_Document_TypeID",

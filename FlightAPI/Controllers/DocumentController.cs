@@ -16,13 +16,17 @@ namespace FlightAPI.Controllers
             _documentService = documentService;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<Document>>> GetAllDocumentByFlightID(int flightID)
+        [HttpGet("get-all-document")]
+        public async Task<ActionResult<List<Document>>>? GetAllDocument()
         {
-            return await _documentService.GetAllDocumentByFlightID(flightID);
+            var result = await _documentService.GetAllDocument();
+            if (result == null) 
+                return NotFound("Can't find the document data.");
+
+            return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get-document/{id}")]
         public async Task<ActionResult<Document>>? GetDocumentById(int id)
         {
             var result = await _documentService.GetDocumentById(id);
@@ -32,8 +36,18 @@ namespace FlightAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<List<Document>>>? AddDocument(AddDocumentDTO document)
+        [HttpPost("{search}")]
+        public async Task<ActionResult<List<Document>>>? GetDocumentBySearch(string search)
+        {
+            var result = await _documentService.GetDocumentBySearch(search);
+            if (result is null)
+                return NotFound("Can't find the document or it's not exist.");
+
+            return Ok(result);
+        }
+
+        [HttpPost("add-document")]
+        public async Task<ActionResult<Document>>? AddDocument( [FromForm] AddDocumentDTO document)
         {
             var result = await _documentService.AddDocument(document);
             if (result is null)
@@ -42,17 +56,17 @@ namespace FlightAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<List<Document>>>? UpdateDocument(int id, Document document)
-        {
-            var result = await _documentService.UpdateDocument(id, document);
-            if (result is null)
-                return NotFound("Not Found Document");
+        //[HttpPut("{id}")]
+        //public async Task<ActionResult<List<Document>>>? UpdateDocument(int id, Document document)
+        //{
+        //    var result = await _documentService.UpdateDocument(id, document);
+        //    if (result is null)
+        //        return NotFound("Not Found Document");
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete-document/{id}")]
         public async Task<ActionResult<List<Document>>>? DeleteDocument(int id)
         {
             var result = await _documentService.DeleteDocument(id);

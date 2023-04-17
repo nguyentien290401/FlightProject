@@ -1,13 +1,16 @@
-﻿using FlightAPI.DatabaseContext;
+﻿using Azure;
+using FlightAPI.DatabaseContext;
 using FlightAPI.Models;
 using FlightAPI.Services.DocumentFileService.DTO;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace FlightAPI.Services.DocumentFileService
 {
     public class DocumentFileService: IDocumentFileService
     {
         private readonly FlightDbContext _dbContext;
+        
         public DocumentFileService(FlightDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -15,24 +18,18 @@ namespace FlightAPI.Services.DocumentFileService
 
         public async Task<DocumentFile>? AddDocumentFile( [FromForm] DocumentFileWithFormFile formFile)
         {
-            //var documentFile = await _dbContext.DocumentFiles.FindAsync();
-
-            ////  Check the id of document file is exist or not
-            //if (documentFile != null)
-            //    return null;
-
             var newDocumentFile = new DocumentFile()
             {
                 FileName = formFile.FileName,
                 CreateDate = DateTime.Now,
-                UserID = formFile.UserID,
+                DocumentID = formFile.DocumentID,
             };
 
             //  Upload File
             if (formFile.FormFile.Length > 0)
             {
                 var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", formFile.FormFile.FileName);
-                using (var stream = System.IO.File.Create(path))
+                using (var stream = File.Create(path))
                 {
                     await formFile.FormFile.CopyToAsync(stream);
                 }

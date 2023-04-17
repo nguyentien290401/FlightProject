@@ -4,6 +4,7 @@ using FlightAPI.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlightAPI.Migrations
 {
     [DbContext(typeof(FlightDbContext))]
-    partial class FlightDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230412130508_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,10 +50,6 @@ namespace FlightAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Note")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -283,7 +282,7 @@ namespace FlightAPI.Migrations
 
             modelBuilder.Entity("FlightAPI.Models.DocumentFile", b =>
                 {
-                    b.HasOne("FlightAPI.Models.Document", null)
+                    b.HasOne("FlightAPI.Models.Document", "Document")
                         .WithMany("DocumentFiles")
                         .HasForeignKey("DocumentID")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -292,6 +291,8 @@ namespace FlightAPI.Migrations
                     b.HasOne("FlightAPI.Models.User", null)
                         .WithMany("DocumentFiles")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Document");
                 });
 
             modelBuilder.Entity("FlightAPI.Models.Document", b =>

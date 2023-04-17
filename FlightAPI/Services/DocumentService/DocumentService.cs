@@ -1,6 +1,8 @@
 ﻿using FlightAPI.DatabaseContext;
 using FlightAPI.Models;
 using FlightAPI.Services.DocumentService.DTO;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FlightAPI.Services.DocumentService
@@ -13,62 +15,88 @@ namespace FlightAPI.Services.DocumentService
             _dbContext = dbContext;
         }
 
-        public async Task<List<Document>> GetAllDocumentByFlightID(int flightID)
+        public async Task<List<Document>>? GetAllDocument()
         {
-            var documents = await _dbContext.Documents.Where(f => f.FlightID == flightID).ToListAsync();
+            var documents = await _dbContext.Documents.ToListAsync();
 
             return documents;
         }  
 
         public async Task<Document>? GetDocumentById(int id)
         {
-            var documentFound = await _dbContext.Documents.FirstOrDefaultAsync(x => x.Id == id);
+            var documentFound = await _dbContext.Documents.Include(f => f.DocumentFiles).FirstOrDefaultAsync(x => x.Id == id);
             if (documentFound is null)
                 return null;
 
             return documentFound;
         }
 
-        public async Task<List<Document>> AddDocument(AddDocumentDTO request)
+        public async Task<List<Document>>? GetDocumentBySearch(string search)
         {
-            var flight = await _dbContext.Flights.FindAsync(request.FlightID);
-            if (flight == null)
+            List<Document> documents = await _dbContext.Documents.Where(f => f.Name.Contains(search) || f.CreateDate.ToString().Contains(search)).ToListAsync();
+
+            if (documents.Count() == 0)
                 return null;
 
+            return documents;
+        }
+
+        public async Task<Document>? AddDocument( [FromForm] AddDocumentDTO document)
+        {
             var newDocument = new Document()
             {
-                Name = request.Name,
-                Note = request.Note,
-                Version = Convert.ToString(request.Version + 0.1),
-                Flight = flight,
+                Name = document.Name,
+                Note = document.Note,
+                CreateDate = DateTime.Now,
+                Version = Convert.ToString(1.0),
+                FlightID = document.FlightID,
+                Document_TypeID = document.Document_TypeID,
+                UserID = document.UserID,
+                GroupID = document.GroupID
             };
+
+            //  Upload file
+            if (document.FormFile.Length > 0)
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "files", document.FormFile.FileName);
+                using (var stream = File.Create(path))
+                {
+                    await document.FormFile.CopyToAsync(stream);
+                }
+                newDocument.Url = "/files/" + document.FormFile.FileName;
+
+            }
+            else
+            {
+                newDocument.Url = "";
+            }
 
             _dbContext.Documents.Add(newDocument);
             await _dbContext.SaveChangesAsync();
 
-            return await GetAllDocumentByFlightID(newDocument.FlightID);
+            return newDocument;
         }
 
-        public async Task<List<Document>>? UpdateDocument(int id, Document document)
-        {
-            if (id != document.Id)
-                return null;
+        //public async Task<List<Document>>? UpdateDocument(int id, Document document)
+        //{
+        //    if (id != document.Id)
+        //        return null;
 
-            var documentFound = await _dbContext.Documents.FindAsync(id);
+        //    var documentFound = await _dbContext.Documents.FindAsync(id);
 
-            if (documentFound is null)
-                return null;
+        //    if (documentFound is null)
+        //        return null;
 
-            documentFound.Name = document.Name;
-            documentFound.CreateDate = document.CreateDate;
-            documentFound.Note = document.Note;
-            documentFound.Version = document.Version;
-            documentFound.FlightID = document.FlightID;
+        //    documentFound.Name = document.Name;
+        //    documentFound.CreateDate = document.CreateDate;
+        //    documentFound.Note = document.Note;
+        //    documentFound.Version = document.Version;
+        //    documentFound.FlightID = document.FlightID;
 
-            await _dbContext.SaveChangesAsync();
+        //    await _dbContext.SaveChangesAsync();
 
-            return await _dbContext.Documents.ToListAsync();
-        }
+        //    return await _dbContext.Documents.ToListAsync();
+        //}
 
         public async Task<List<Document>>? DeleteDocument(int id)
         {

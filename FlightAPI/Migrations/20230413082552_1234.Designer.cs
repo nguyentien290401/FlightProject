@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlightAPI.Migrations
 {
     [DbContext(typeof(FlightDbContext))]
-    [Migration("20230406095956_Initial")]
-    partial class Initial
+    [Migration("20230413082552_1234")]
+    partial class _1234
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,10 @@ namespace FlightAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("UserID")
                         .HasColumnType("int");
 
@@ -84,7 +88,7 @@ namespace FlightAPI.Migrations
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("DocumentId")
+                    b.Property<int>("DocumentID")
                         .HasColumnType("int");
 
                     b.Property<string>("FileName")
@@ -95,14 +99,14 @@ namespace FlightAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserID")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DocumentId");
+                    b.HasIndex("DocumentID");
 
-                    b.HasIndex("UserID");
+                    b.HasIndex("UserId");
 
                     b.ToTable("DocumentFiles");
                 });
@@ -284,15 +288,13 @@ namespace FlightAPI.Migrations
                 {
                     b.HasOne("FlightAPI.Models.Document", null)
                         .WithMany("DocumentFiles")
-                        .HasForeignKey("DocumentId");
-
-                    b.HasOne("FlightAPI.Models.User", "User")
-                        .WithMany("DocumentFiles")
-                        .HasForeignKey("UserID")
+                        .HasForeignKey("DocumentID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("FlightAPI.Models.User", null)
+                        .WithMany("DocumentFiles")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("FlightAPI.Models.Document", b =>
