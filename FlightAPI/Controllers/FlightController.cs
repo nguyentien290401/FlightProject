@@ -1,12 +1,14 @@
 ﻿using FlightAPI.Models;
 using FlightAPI.Services.FlightService;
 using FlightAPI.Services.FlightService.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlightAPI.Controllers
 {
     [Route("api/flight")]
     [ApiController]
+    [Authorize(Roles = "Admin,Staff,Pilot,Stewardess")]
     public class FlightController : ControllerBase
     {
         private readonly IFlightService _flightService;

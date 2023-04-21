@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FlightAPI.Models
@@ -15,16 +16,21 @@ namespace FlightAPI.Models
         public byte[] PasswordHash { get; set; } = new byte[32];
         public byte[] PasswordSalt { get; set; } = new byte[32];
 
-        public string? VerificationToken { get; set; }
+        public string? VerificationOTP { get; set; }
         public DateTime? VerifiedAt { get; set; }
 
-        public string? PasswordResetToken { get; set; }
-        public DateTime? ResetTokenExpires { get; set; }
+        public string? PasswordResetOTP { get; set; }
+        public DateTime? ResetOTPExpires { get; set; }
 
-        //public int RoleID { get; set; }
-        //public Role Role { get; set; }
+        public int RoleID { get; set; }
 
+        [JsonIgnore]
+        public Role Role { get; set; }
+
+        [JsonIgnore]
         public List<Document> Document { get; set; }
+
+        [JsonIgnore]
         public List<DocumentFile> DocumentFiles { get; set; }
     }
 }

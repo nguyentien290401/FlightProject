@@ -4,11 +4,13 @@ using FlightAPI.DatabaseContext;
 using FlightAPI.Models;
 using FlightAPI.Services.GroupService;
 using FlightAPI.Services.GroupService.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FlightAPI.Controllers
 {
     [Route("api/group")]
     [ApiController]
+    [Authorize(Roles = "Admin,Staff")]
     public class GroupController : ControllerBase
     {
         private readonly IGroupService _groupService;

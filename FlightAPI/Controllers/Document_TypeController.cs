@@ -9,11 +9,13 @@ using FlightAPI.DatabaseContext;
 using FlightAPI.Models;
 using FlightAPI.Services.DocumentTypeService;
 using FlightAPI.Services.DocumentTypeService.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FlightAPI.Controllers
 {
     [Route("api/document-type")]
     [ApiController]
+    [Authorize(Roles = "Admin, Staff")]
     public class Document_TypeController : ControllerBase
     {
         private readonly IDocumentTypeService _documentTypeService;

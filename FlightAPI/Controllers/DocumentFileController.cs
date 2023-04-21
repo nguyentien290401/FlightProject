@@ -2,6 +2,7 @@
 using FlightAPI.Models;
 using FlightAPI.Services.DocumentFileService;
 using FlightAPI.Services.DocumentFileService.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
@@ -12,6 +13,7 @@ namespace FlightAPI.Controllers
 {
     [Route("api/document-file")]
     [ApiController]
+    [Authorize(Roles = "Admin,Staff")]
     public class DocumentFileController : ControllerBase
     {
         private readonly IDocumentFileService _documentFileService;

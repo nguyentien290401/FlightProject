@@ -1,15 +1,13 @@
 ﻿using FlightAPI.Models;
 using FlightAPI.Services.UserService;
 using FlightAPI.Services.UserService.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlightAPI.Controllers
 {
     [Route("api/user")]
-
-    //localhost:3000/api/User/1
-
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -20,6 +18,7 @@ namespace FlightAPI.Controllers
             _userService = userService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(UserRegisterDTO request)
         {
@@ -32,20 +31,22 @@ namespace FlightAPI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<User>> Login(UserLoginDTO request)
+        [AllowAnonymous]
+        public async Task<ActionResult<string>> Login(UserLoginDTO request)
         {
             var result = await _userService.Login(request);
 
             if (result == null)
                 return BadRequest("Login failed !");
 
-            return Ok($"Welcome back, {result.Username}! :)");
+            return Ok(result);
         }
 
         [HttpPost("verify-email")]
-        public async Task<ActionResult<User>> VerifyEmail(string token)
+        [AllowAnonymous]
+        public async Task<ActionResult<User>> VerifyEmail(string otp)
         {
-            var result = await _userService.VerifyEmail(token);
+            var result = await _userService.VerifyEmail(otp);
 
             if (result == null)
                 return BadRequest("Email verification failed !");
@@ -54,6 +55,7 @@ namespace FlightAPI.Controllers
         }
 
         [HttpPost("forgot-password")]
+        [AllowAnonymous]
         public async Task<ActionResult<User>> ForgotPassword(string email)
         {
             var result = await _userService.ForgotPassword(email);
@@ -65,6 +67,7 @@ namespace FlightAPI.Controllers
         }
 
         [HttpPost("reset-password")]
+        [AllowAnonymous]
         public async Task<ActionResult<User>> ResetPassword(ResetPasswordDTO request)
         {
             var result = await _userService.ResetPassword(request);
@@ -75,14 +78,14 @@ namespace FlightAPI.Controllers
             return Ok("Reset password sucessfully !");
         }
 
-        [HttpGet("get-all")]
+        [HttpGet("get-all"), Authorize(Roles = "Admin,Staff")]
         public async Task<ActionResult<List<User>>> GetAllUser()
         {
             // Trả về toàn bộ dữ liệu || OK là status code 200
             return await _userService.GetAllUser();
         }
 
-        [HttpGet("get-by-id/{id}")]
+        [HttpGet("get-by-id/{id}"), Authorize(Roles = "Admin,Staff")]
         public async Task<ActionResult<User>> GetUserProfile(int id)
         {
             // Tìm User bằng id
@@ -93,29 +96,7 @@ namespace FlightAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPost("add")]
-        public async Task<ActionResult<List<User>>> AddUser(User user)
-        {
-            // dữ liệu mẫu đem Add thêm model user vào
-            var result = await _userService.AddUser(user);
-            if (result is null)
-                return NotFound("user not found");
-
-            return Ok(result);
-        }
-
-        [HttpPut("update/{id}")]
-        public async Task<ActionResult<List<User>>> UpdateUser(int id, User user)
-        {
-            // tìm user
-            var result = await _userService.UpdateUser(id, user);
-            if (result is null)
-                return NotFound("user not found");
-
-            return Ok(result);
-        }
-
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("delete/{id}"), Authorize(Roles = "Admin,Staff")]
         public async Task<ActionResult<List<User>>> DeleteUser(int id)
         {
 

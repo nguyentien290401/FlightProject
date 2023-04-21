@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using FlightAPI.Models;
 using FlightAPI.Services.DocumentService;
 using FlightAPI.Services.DocumentService.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FlightAPI.Controllers
 {
     [Route("api/document")]
     [ApiController]
+    [Authorize(Roles = "Admin,Staff,Pilot,Stewardess")]
+    
     public class DocumentController : ControllerBase
     {
         private readonly IDocumentService _documentService;
@@ -66,7 +69,7 @@ namespace FlightAPI.Controllers
         //    return Ok(result);
         //}
 
-        [HttpDelete("delete-document/{id}")]
+        [HttpDelete("delete-document/{id}"), Authorize(Roles = "Admin,Staff")]
         public async Task<ActionResult<List<Document>>>? DeleteDocument(int id)
         {
             var result = await _documentService.DeleteDocument(id);

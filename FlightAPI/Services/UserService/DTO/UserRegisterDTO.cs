@@ -20,5 +20,8 @@ namespace FlightAPI.Services.UserService.DTO
 
         [Required, Compare("Password")]
         public string ConfirmPassword { get; set; } = string.Empty;
+
+        [Required]
+        public int RoleID { get; set; }
     }
 }
